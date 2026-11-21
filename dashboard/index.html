@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Launch Radar</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="hero">
+  <p class="kicker">SEALED SNAPSHOT &middot; DEFILLAMA &middot; <span id="asOf"></span></p>
+  <h1>Token Launch Radar</h1>
+  <p class="sub">Which protocols still record no token &mdash; and what that token would be worth if it launched tomorrow. Ranked by an implied value built only from the snapshot&rsquo;s own figures.</p>
+  <div class="stats" id="stats"></div>
+</header>
+
+<main>
+  <section class="controls" aria-label="Filter the board">
+    <input id="q" type="search" placeholder="Search a protocol&hellip;" aria-label="Search a protocol">
+    <select id="cat" aria-label="Filter by category"></select>
+    <select id="chain" aria-label="Filter by chain"></select>
+    <select id="sort" aria-label="Sort the board">
+      <option value="value">Sort: implied value</option>
+      <option value="tvl">Sort: TVL</option>
+      <option value="growth">Sort: 7-day growth</option>
+      <option value="age">Sort: oldest first</option>
+    </select>
+    <label class="check"><input id="watch" type="checkbox"> Watchlist only</label>
+    <label class="check"><input id="early" type="checkbox"> Early rows only</label>
+  </section>
+
+  <p class="count" id="count"></p>
+
+  <section class="board-wrap">
+    <table class="board">
+      <thead><tr>
+        <th>#</th><th>Protocol</th><th>Category</th><th>Chains</th>
+        <th class="num">TVL</th><th class="num">7d</th><th class="num">Age</th><th class="num">Implied</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </section>
+
+  <section class="detail" id="detail" aria-live="polite"></section>
+
+  <section class="model">
+    <h2>How the implied value is built</h2>
+    <p><strong>implied = TVL &times; category ratio &times; growth &times; maturity &times; breadth</strong></p>
+    <ul>
+      <li><strong>Category ratio</strong> &mdash; the median market-cap-to-TVL ratio of protocols in the same category that already trade, shrunk toward the global median (prior: 5 protocols) and capped at 2.0. A category with few live tokens stays near the global ratio instead of swinging the board.</li>
+      <li><strong>Growth</strong> &mdash; 1 + (7-day TVL change, clamped to &minus;60%..+120%) &times; 0.5.</li>
+      <li><strong>Maturity</strong> &mdash; 0.6 + (days listed, capped at 1,095) / 1,095 &times; 0.4. A protocol that has run longer with no token scores higher; unknown age counts as 365 days.</li>
+      <li><strong>Breadth</strong> &mdash; 1 + 0.02 per extra chain, up to 4 extra chains.</li>
+    </ul>
+    <p class="note">No protocol name is ever special-cased: the same function scores every row. &ldquo;Pre-token&rdquo; means the snapshot records no token for it &mdash; never that it has none. A protocol on the list may still have a token its DefiLlama record does not carry.</p>
+    <p class="note">Farm plans are the entry&rsquo;s own suggestions, derived from each protocol&rsquo;s category, chains, TVL and age. They are not investment advice, and a launch is never predicted &mdash; only priced, if it happened.</p>
+  </section>
+
+  <section class="live">
+    <h2>Live tokens: the market&rsquo;s own values</h2>
+    <p>Protocols that already trade, shown at their real market cap &mdash; never mixed into the ranking. Their market-cap-to-TVL ratios are what the category ratios above are built from.</p>
+    <table class="board">
+      <thead><tr><th>Protocol</th><th>Category</th><th class="num">TVL</th><th class="num">Market cap</th><th class="num">Mcap / TVL</th></tr></thead>
+      <tbody id="liveRows"></tbody>
+    </table>
+  </section>
+</main>
+
+<footer>
+  <p>Snapshot: <span id="source"></span> &middot; Watchlist floor: <span id="floor"></span> &middot; Model radar-2</p>
+</footer>
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
